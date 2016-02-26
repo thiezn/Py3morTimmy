@@ -4,13 +4,13 @@ import asyncio
 import evdev
 
 
-class Ps3Controller:
+class RemoteControl:
     async def _events(self):
         """ Coroutine printing out incoming events """
         async for event in self.device.async_read_loop():
             self.handle_event(event)
 
-    def __init__(self, input_device='/dev/input/event0'):
+    def __init__(self, input_device='/dev/input/event0', loop=None):
         """ Connect to controller and define buttons """
 
         print('Trying to connect to controller')
@@ -21,30 +21,31 @@ class Ps3Controller:
         self.LEFT_AXIS_Y = 127
         self.RIGHT_AXIS_X = 127
         self.RIGHT_AXIS_Y = 127
-        self.BUTTON_SELECT = False
-        self.BUTTON_START = False
-        self.BUTTON_LEFT_STICK = False
-        self.BUTTON_RIGHT_STICK = False
-        self.BUTTON_D_LEFT = False
-        self.BUTTON_D_UP = False
-        self.BUTTON_D_RIGHT = False
-        self.BUTTON_D_DOWN = False
-        self.BUTTON_PS = False
-        self.BUTTON_SQUARE = False
-        self.BUTTON_TRIANGLE = False
-        self.BUTTON_CIRCLE = False
-        self.BUTTON_CROSS = False
-        self.BUTTON_R1 = False
-        self.BUTTON_R2 = False
-        self.BUTTON_L1 = False
-        self.BUTTON_L2 = False
+        self.SELECT = False
+        self.START = False
+        self.LEFT_STICK = False
+        self.RIGHT_STICK = False
+        self.LEFT = False
+        self.UP = False
+        self.RIGHT = False
+        self.DOWN = False
+        self.PS = False
+        self.SQUARE = False
+        self.TRIANGLE = False
+        self.CIRCLE = False
+        self.CROSS = False
+        self.R1 = False
+        self.R2 = False
+        self.L1 = False
+        self.L2 = False
 
     async def handle_events(self):
         """
         Handle a single evdev event, this updates the internal state of the Axis objects as well as calling any
         registered button handlers.
         """
-        async for event in self.device.async_read_loop():
+        events = await self.device.async_read()
+        for event in events:
             if event.type == evdev.ecodes.EV_ABS:
                 if event.code == 0:
                     # Left stick, X axis
@@ -61,86 +62,77 @@ class Ps3Controller:
             elif event.type == evdev.ecodes.EV_KEY:
                 if event.value == 1:  # Key Down
                     if event.code == 288:
-                        self.BUTTON_SELECT = True
+                        self.SELECT = True
                     elif event.code == 291:
-                        self.BUTTON_START = True
+                        self.START = True
                     elif event.code == 289:
-                        self.BUTTON_LEFT_STICK = True
+                        self.LEFT_STICK = True
                     elif event.code == 290:
-                        self.BUTTON_RIGHT_STICK = True
+                        self.RIGHT_STICK = True
                     elif event.code == 295:
-                        self.BUTTON_D_LEFT = True
+                        self.LEFT = True
                     elif event.code == 292:
-                        self.BUTTON_D_UP = True
+                        print('UP')
+                        self.UP = True
                     elif event.code == 293:
-                        self.BUTTON_D_RIGHT = True
+                        self.RIGHT = True
                     elif event.code == 294:
-                        self.BUTTON_D_DOWN = True
+                        self.DOWN = True
                     elif event.code == 704:
-                        self.BUTTON_PS = True
+                        self.PS = True
                     elif event.code == 303:
-                        self.BUTTON_SQUARE = True
+                        self.SQUARE = True
                     elif event.code == 300:
-                        self.BUTTON_TRIANGLE = True
+                        self.TRIANGLE = True
                     elif event.code == 301:
-                        self.BUTTON_CIRCLE = True
+                        self.CIRCLE = True
                     elif event.code == 302:
-                        self.BUTTON_CROSS = True
+                        self.CROSS = True
                     elif event.code == 299:
-                        self.BUTTON_R1 = True
+                        self.R1 = True
                     elif event.code == 297:
-                        self.BUTTON_R2 = True
+                        self.R2 = True
                     elif event.code == 298:
-                        self.BUTTON_L1 = True
+                        self.L1 = True
                     elif event.code == 296:
-                        self.BUTTON_L2 = True
+                        self.L2 = True
                 elif event.value == 2:  # Key hold
                     pass
                 elif event.value == 0:  # Key UP
                     if event.code == 288:
-                        self.BUTTON_SELECT = False
+                        self.SELECT = False
                     elif event.code == 291:
-                        self.BUTTON_START = False
+                        self.START = False
                     elif event.code == 289:
-                        self.BUTTON_LEFT_STICK = False
+                        self.LEFT_STICK = False
                     elif event.code == 290:
-                        self.BUTTON_RIGHT_STICK = False
+                        self.RIGHT_STICK = False
                     elif event.code == 295:
-                        self.BUTTON_D_LEFT = False
+                        self.LEFT = False
                     elif event.code == 292:
-                        self.BUTTON_D_UP = False
+                        self.UP = False
                     elif event.code == 293:
-                        self.BUTTON_D_RIGHT = False
+                        self.RIGHT = False
                     elif event.code == 294:
-                        self.BUTTON_D_DOWN = False
+                        self.DOWN = False
                     elif event.code == 704:
-                        self.BUTTON_PS = False
+                        self.PS = False
                     elif event.code == 303:
-                        self.BUTTON_SQUARE = False
+                        self.SQUARE = False
                     elif event.code == 300:
-                        self.BUTTON_TRIANGLE = False
+                        self.TRIANGLE = False
                     elif event.code == 301:
-                        self.BUTTON_CIRCLE = False
+                        self.CIRCLE = False
                     elif event.code == 302:
-                        self.BUTTON_CROSS = False
+                        self.CROSS = False
                     elif event.code == 299:
-                        self.BUTTON_R1 = False
+                        self.R1 = False
                     elif event.code == 297:
-                        self.BUTTON_R2 = False
+                        self.R2 = False
                     elif event.code == 298:
-                        self.BUTTON_L1 = False
+                        self.L1 = False
                     elif event.code == 296:
-                        self.BUTTON_L2 = False
-            print('left x={} y={}    right x={} y={}'.format(self.LEFT_AXIS_X,
-                                                             self.LEFT_AXIS_Y,
-                                                             self.RIGHT_AXIS_X,
-                                                             self.RIGHT_AXIS_Y))
-
-
-
+                        self.L2 = False
 
 if __name__ == '__main__':
     controller = Ps3Controller()
-    future = asyncio.ensure_future(controller.handle_events())
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(future)

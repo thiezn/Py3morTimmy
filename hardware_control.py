@@ -7,7 +7,7 @@ import numpy
 import time
 import random
 from collections import deque
-from ps3_remote_control import RemoteControl
+from ps3_controller import RemoteControl
 
 # Global Definitions
 MAX_DISTANCE = 200 # The maximum distance the sonar sensor will read
@@ -249,23 +249,26 @@ class DcMotors:
         board.analog_write(MOTOR4_ENABLE_PIN, 0)
 
 
-def loop(board, dc_motors, sonar):
+def run(board, dc_motors, sonar):
     """ This is the main running loop
 
     This will handle time based action like starting, stopping
     and turning for x amount of time when an obstacle is detected
     """
 
-    # Initialise the remote control and run in seperate thread
+    # Initialise the remote controller
     joystick = RemoteControl()
-    joystick.start()
 
     turn_attempts = 0  # Keeps track of the amount of turn iterations
     drive_autonomous = False
 
     print('Starting main loop')
     while not joystick.START:
+        future = asyncio.ensure_future(joystick.handle_events())
+        board.loop.run_until_complete(future)
+
         current_time = time.time()
+        print(current_time)
 
         # Switch driving mode
         if joystick.SELECT:
@@ -360,6 +363,6 @@ if __name__ == "__main__":
 
     print('Robot initialised, remote controlled. press <SELECT> to toggle autonomous driving')
     try:
-        loop(board, dc_motors, sonar)
+        run(board, dc_motors, sonar)
     except KeyboardInterrupt:
         board.shutdown()
