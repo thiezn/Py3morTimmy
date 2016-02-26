@@ -7,11 +7,11 @@ import numpy
 import time
 import random
 from collections import deque
-from remote_control import RemoteControl
+from ps3_remote_control import RemoteControl
 
 # Global Definitions
 MAX_DISTANCE = 200 # The maximum distance the sonar sensor will read
-MIN_DISTANCE = 40  # 10 cm before turning random direction
+MIN_DISTANCE = 20  # Distance to start avoiding
 MAX_TURN_ATTEMPTS = 3  # The amount of tries to turn until going in reverse
 
 # Pin Definitions
@@ -92,6 +92,7 @@ class Sonar:
         :param data: list containing [trigger_pin, distance in cm]
         adds the received data to the _sensor_data list
         """
+        print("Async Sensor Data {}".format(data[1]))
         self._sensor_data.append(data[1])
 
 
@@ -255,10 +256,14 @@ def loop(board, dc_motors, sonar):
     and turning for x amount of time when an obstacle is detected
     """
 
+    # Initialise the remote control and run in seperate thread
     joystick = RemoteControl()
+    joystick.start()
+
     turn_attempts = 0  # Keeps track of the amount of turn iterations
     drive_autonomous = False
 
+    print('Starting main loop')
     while not joystick.START:
         current_time = time.time()
 
@@ -274,6 +279,7 @@ def loop(board, dc_motors, sonar):
                 dc_motors.forward(100)
             # Have to wait for a few seconds as a single button press
             # on SELECT generates multiple hits
+            print('hello')
             board.sleep(0.2)
 
         # Remote controlled driving
@@ -292,7 +298,7 @@ def loop(board, dc_motors, sonar):
         # Autonomous Driving
         else: 
             distance = sonar.distance
-            print('distance: %s' % distance)
+#            print('distance: %s' % distance)
 
             # Getting to close, lets try to turn
             if distance < MIN_DISTANCE and not dc_motors.state.startswith('turning'):
@@ -344,7 +350,6 @@ def loop(board, dc_motors, sonar):
             board.sleep(0.2)
 
     # End while loop
-    joystick.shutdown()
     board.shutdown()
 
 if __name__ == "__main__":
