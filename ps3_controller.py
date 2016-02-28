@@ -13,7 +13,7 @@ class RemoteControl:
     def __init__(self, input_device='/dev/input/event0', loop=None):
         """ Connect to controller and define buttons """
 
-        print('Trying to connect to controller')
+        print('Trying to connect to controller...')
         self.device = evdev.InputDevice(input_device)
         print(self.device)
 
@@ -72,7 +72,6 @@ class RemoteControl:
                     elif event.code == 295:
                         self.LEFT = True
                     elif event.code == 292:
-                        print('UP')
                         self.UP = True
                     elif event.code == 293:
                         self.RIGHT = True

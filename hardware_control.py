@@ -17,24 +17,24 @@ MAX_TURN_ATTEMPTS = 3  # The amount of tries to turn until going in reverse
 # Pin Definitions
 
 # DC Motor Front Left
-MOTOR1_PIN1 = 30
-MOTOR1_PIN2 = 31
-MOTOR1_ENABLE_PIN = 7
+MOTOR_FRONT_LEFT_PIN1 = 30
+MOTOR_FRONT_LEFT_PIN2 = 31
+MOTOR_FRONT_LEFT_ENABLE_PIN = 7
 
 # DC Motor Rear Left
-MOTOR2_PIN1 = 34
-MOTOR2_PIN2 = 35
-MOTOR2_ENABLE_PIN = 3
+MOTOR_REAR_LEFT_PIN1 = 34
+MOTOR_REAR_LEFT_PIN2 = 35
+MOTOR_REAR_LEFT_ENABLE_PIN = 3
 
 # DC Motor Rear Right
-MOTOR3_PIN1 = 39
-MOTOR3_PIN2 = 38
-MOTOR3_ENABLE_PIN = 44
+MOTOR_REAR_RIGHT_PIN1 = 39
+MOTOR_REAR_RIGHT_PIN2 = 38
+MOTOR_REAR_RIGHT_ENABLE_PIN = 44
 
 # DC Motor Front Right
-MOTOR4_PIN1 = 41
-MOTOR4_PIN2 = 40
-MOTOR4_ENABLE_PIN = 45
+MOTOR_FRONT_RIGHT_PIN1 = 41
+MOTOR_FRONT_RIGHT_PIN2 = 40
+MOTOR_FRONT_RIGHT_ENABLE_PIN = 45
 
 # Sonar distance sensors
 TRIGGER_PIN = 22
@@ -92,7 +92,7 @@ class Sonar:
         :param data: list containing [trigger_pin, distance in cm]
         adds the received data to the _sensor_data list
         """
-        print("Async Sensor Data {}".format(data[1]))
+        # print("Async Sensor Data {}".format(data[1]))
         self._sensor_data.append(data[1])
 
 
@@ -106,21 +106,21 @@ class DcMotors:
 
         self.state = "stopped"
 
-        self.board.set_pin_mode(MOTOR1_PIN1, Constants.OUTPUT)
-        self.board.set_pin_mode(MOTOR1_PIN2, Constants.OUTPUT)
-        self.board.set_pin_mode(MOTOR1_ENABLE_PIN, Constants.PWM)
+        self.board.set_pin_mode(MOTOR_FRONT_LEFT_PIN1, Constants.OUTPUT)
+        self.board.set_pin_mode(MOTOR_FRONT_LEFT_PIN2, Constants.OUTPUT)
+        self.board.set_pin_mode(MOTOR_FRONT_LEFT_ENABLE_PIN, Constants.PWM)
 
-        self.board.set_pin_mode(MOTOR2_PIN1, Constants.OUTPUT)
-        self.board.set_pin_mode(MOTOR2_PIN2, Constants.OUTPUT)
-        self.board.set_pin_mode(MOTOR2_ENABLE_PIN, Constants.PWM)
+        self.board.set_pin_mode(MOTOR_REAR_LEFT_PIN1, Constants.OUTPUT)
+        self.board.set_pin_mode(MOTOR_REAR_LEFT_PIN2, Constants.OUTPUT)
+        self.board.set_pin_mode(MOTOR_REAR_LEFT_ENABLE_PIN, Constants.PWM)
 
-        self.board.set_pin_mode(MOTOR3_PIN1, Constants.OUTPUT)
-        self.board.set_pin_mode(MOTOR3_PIN2, Constants.OUTPUT)
-        self.board.set_pin_mode(MOTOR3_ENABLE_PIN, Constants.PWM)
+        self.board.set_pin_mode(MOTOR_REAR_RIGHT_PIN1, Constants.OUTPUT)
+        self.board.set_pin_mode(MOTOR_REAR_RIGHT_PIN2, Constants.OUTPUT)
+        self.board.set_pin_mode(MOTOR_REAR_RIGHT_ENABLE_PIN, Constants.PWM)
 
-        self.board.set_pin_mode(MOTOR4_PIN1, Constants.OUTPUT)
-        self.board.set_pin_mode(MOTOR4_PIN2, Constants.OUTPUT)
-        self.board.set_pin_mode(MOTOR4_ENABLE_PIN, Constants.PWM)
+        self.board.set_pin_mode(MOTOR_FRONT_RIGHT_PIN1, Constants.OUTPUT)
+        self.board.set_pin_mode(MOTOR_FRONT_RIGHT_PIN2, Constants.OUTPUT)
+        self.board.set_pin_mode(MOTOR_FRONT_RIGHT_ENABLE_PIN, Constants.PWM)
 
     @property
     def action_time_duration(self):
@@ -150,19 +150,115 @@ class DcMotors:
         self.action_time_start = time.time()
 
         self.state = 'forward'
-        self.board.digital_write(MOTOR1_PIN1, 0)
-        self.board.digital_write(MOTOR1_PIN2, 1)
-        self.board.digital_write(MOTOR2_PIN1, 0)
-        self.board.digital_write(MOTOR2_PIN2, 1)
-        self.board.digital_write(MOTOR3_PIN1, 0)
-        self.board.digital_write(MOTOR3_PIN2, 1)
-        self.board.digital_write(MOTOR4_PIN1, 0)
-        self.board.digital_write(MOTOR4_PIN2, 1)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN1, 0)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN2, 1)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN1, 0)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN2, 1)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN1, 0)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN2, 1)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN1, 0)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN2, 1)
 
-        self.board.analog_write(MOTOR1_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR2_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR3_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR4_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_FRONT_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_RIGHT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_FRONT_RIGHT_ENABLE_PIN, speed)
+
+    def up_left(self, speed, duration=None):
+        """ Move soft left forward
+
+        :param speed: Speed of motors 0-255
+        :param duration: Duration of the action in seconds
+        """
+        self.action_time_duration = duration
+        self.action_time_start = time.time()
+
+        self.state = 'forward'
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN1, 0)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN2, 1)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN1, 0)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN2, 1)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN1, 0)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN2, 1)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN1, 0)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN2, 1)
+
+        self.board.analog_write(MOTOR_FRONT_LEFT_ENABLE_PIN, int(speed/4))
+        self.board.analog_write(MOTOR_REAR_LEFT_ENABLE_PIN, int(speed/4))
+        self.board.analog_write(MOTOR_REAR_RIGHT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_FRONT_RIGHT_ENABLE_PIN, speed)
+
+    def up_right(self, speed, duration=None):
+        """ Move soft right forward
+
+        :param speed: Speed of motors 0-255
+        :param duration: Duration of the action in seconds
+        """
+        self.action_time_duration = duration
+        self.action_time_start = time.time()
+
+        self.state = 'forward'
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN1, 0)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN2, 1)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN1, 0)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN2, 1)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN1, 0)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN2, 1)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN1, 0)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN2, 1)
+
+        self.board.analog_write(MOTOR_FRONT_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_RIGHT_ENABLE_PIN, int(speed/4))
+        self.board.analog_write(MOTOR_FRONT_RIGHT_ENABLE_PIN, int(speed/4))
+
+    def down_left(self, speed, duration=None):
+        """ Move soft left reverse
+
+        :param speed: Speed of motors 0-255
+        :param duration: Duration of the action in seconds
+        """
+        self.action_time_duration = duration
+        self.action_time_start = time.time()
+
+        self.state = 'reverse'
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN1, 1)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN2, 0)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN1, 1)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN2, 0)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN1, 1)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN2, 0)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN1, 1)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN2, 0)
+
+        self.board.analog_write(MOTOR_FRONT_LEFT_ENABLE_PIN, int(speed/4))
+        self.board.analog_write(MOTOR_REAR_LEFT_ENABLE_PIN, int(speed/4))
+        self.board.analog_write(MOTOR_REAR_RIGHT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_FRONT_RIGHT_ENABLE_PIN, speed)
+
+    def down_right(self, speed, duration=None):
+        """ Move soft right reverse
+
+        :param speed: Speed of motors 0-255
+        :param duration: Duration of the action in seconds
+        """
+        self.action_time_duration = duration
+        self.action_time_start = time.time()
+
+        self.state = 'reverse'
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN1, 1)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN2, 0)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN1, 1)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN2, 0)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN1, 1)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN2, 0)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN1, 1)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN2, 0)
+
+        self.board.analog_write(MOTOR_FRONT_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_RIGHT_ENABLE_PIN, int(speed/4))
+        self.board.analog_write(MOTOR_FRONT_RIGHT_ENABLE_PIN, int(speed/4))
 
     def reverse(self, speed, duration=None):
         """ Reverse motors
@@ -174,19 +270,19 @@ class DcMotors:
         self.action_time_start = time.time()
 
         self.state = 'reverse'
-        self.board.digital_write(MOTOR1_PIN1, 1)
-        self.board.digital_write(MOTOR1_PIN2, 0)
-        self.board.digital_write(MOTOR2_PIN1, 1)
-        self.board.digital_write(MOTOR2_PIN2, 0)
-        self.board.digital_write(MOTOR3_PIN1, 1)
-        self.board.digital_write(MOTOR3_PIN2, 0)
-        self.board.digital_write(MOTOR4_PIN1, 1)
-        self.board.digital_write(MOTOR4_PIN2, 0)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN1, 1)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN2, 0)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN1, 1)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN2, 0)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN1, 1)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN2, 0)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN1, 1)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN2, 0)
 
-        self.board.analog_write(MOTOR1_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR2_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR3_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR4_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_FRONT_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_RIGHT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_FRONT_RIGHT_ENABLE_PIN, speed)
 
     def right(self, speed, duration=None):
         """ Turns right
@@ -199,19 +295,19 @@ class DcMotors:
         self.action_time_start = time.time()
         self.state = 'turning_left'
 
-        self.board.digital_write(MOTOR1_PIN1, 0)
-        self.board.digital_write(MOTOR1_PIN2, 1)
-        self.board.digital_write(MOTOR2_PIN1, 0)
-        self.board.digital_write(MOTOR2_PIN2, 1)
-        self.board.digital_write(MOTOR3_PIN1, 1)
-        self.board.digital_write(MOTOR3_PIN2, 0)
-        self.board.digital_write(MOTOR4_PIN1, 1)
-        self.board.digital_write(MOTOR4_PIN2, 0)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN1, 0)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN2, 1)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN1, 0)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN2, 1)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN1, 1)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN2, 0)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN1, 1)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN2, 0)
 
-        self.board.analog_write(MOTOR1_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR2_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR3_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR4_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_FRONT_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_RIGHT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_FRONT_RIGHT_ENABLE_PIN, speed)
 
     def left(self, speed, duration=None):
         """ Turn left
@@ -224,29 +320,29 @@ class DcMotors:
         self.action_time_start = time.time()
         self.state = 'turning_right'
 
-        self.board.digital_write(MOTOR1_PIN1, 1)
-        self.board.digital_write(MOTOR1_PIN2, 0)
-        self.board.digital_write(MOTOR2_PIN1, 1)
-        self.board.digital_write(MOTOR2_PIN2, 0)
-        self.board.digital_write(MOTOR3_PIN1, 0)
-        self.board.digital_write(MOTOR3_PIN2, 1)
-        self.board.digital_write(MOTOR4_PIN1, 0)
-        self.board.digital_write(MOTOR4_PIN2, 1)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN1, 1)
+        self.board.digital_write(MOTOR_FRONT_LEFT_PIN2, 0)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN1, 1)
+        self.board.digital_write(MOTOR_REAR_LEFT_PIN2, 0)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN1, 0)
+        self.board.digital_write(MOTOR_REAR_RIGHT_PIN2, 1)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN1, 0)
+        self.board.digital_write(MOTOR_FRONT_RIGHT_PIN2, 1)
 
-        self.board.analog_write(MOTOR1_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR2_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR3_ENABLE_PIN, speed)
-        self.board.analog_write(MOTOR4_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_FRONT_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_LEFT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_REAR_RIGHT_ENABLE_PIN, speed)
+        self.board.analog_write(MOTOR_FRONT_RIGHT_ENABLE_PIN, speed)
 
     def stop(self):
         """ Stop all motors """
 
         self.state = 'stopped'
 
-        board.analog_write(MOTOR1_ENABLE_PIN, 0)
-        board.analog_write(MOTOR2_ENABLE_PIN, 0)
-        board.analog_write(MOTOR3_ENABLE_PIN, 0)
-        board.analog_write(MOTOR4_ENABLE_PIN, 0)
+        board.analog_write(MOTOR_FRONT_LEFT_ENABLE_PIN, 0)
+        board.analog_write(MOTOR_REAR_LEFT_ENABLE_PIN, 0)
+        board.analog_write(MOTOR_REAR_RIGHT_ENABLE_PIN, 0)
+        board.analog_write(MOTOR_FRONT_RIGHT_ENABLE_PIN, 0)
 
 
 def run(board, dc_motors, sonar):
@@ -268,7 +364,6 @@ def run(board, dc_motors, sonar):
         board.loop.run_until_complete(future)
 
         current_time = time.time()
-        print(current_time)
 
         # Switch driving mode
         if joystick.SELECT:
@@ -280,14 +375,18 @@ def run(board, dc_motors, sonar):
                 drive_autonomous = True
                 turn_attempts = 0
                 dc_motors.forward(100)
-            # Have to wait for a few seconds as a single button press
-            # on SELECT generates multiple hits
-            print('hello')
-            board.sleep(0.2)
 
         # Remote controlled driving
         if not drive_autonomous:
-            if joystick.UP:
+            if joystick.UP and joystick.LEFT:
+                dc_motors.up_left(255)
+            elif joystick.UP and joystick.RIGHT:
+                dc_motors.up_right(255)
+            elif joystick.DOWN and joystick.LEFT:
+                dc_motors.down_left(255)
+            elif joystick.DOWN and joystick.RIGHT:
+                dc_motors.down_right(255)
+            elif joystick.UP:
                 dc_motors.forward(255)
             elif joystick.DOWN:
                 dc_motors.reverse(255)
@@ -301,18 +400,18 @@ def run(board, dc_motors, sonar):
         # Autonomous Driving
         else: 
             distance = sonar.distance
-#            print('distance: %s' % distance)
+            print('distance: %s' % distance)
 
             # Getting to close, lets try to turn
             if distance < MIN_DISTANCE and not dc_motors.state.startswith('turning'):
                 turn_attempts += 1
                 random_value = random.randint(1, 2)
                 if random_value == 1:
-                    print('Getting too close, turning left for 1 seconds!')
-                    dc_motors.left(255, 1)
+                    print('Getting too close, turning left for 2 seconds!')
+                    dc_motors.left(255, 3)
                 elif random_value == 2:
-                    dc_motors.right(255, 1)
-                    print('Getting too close, turning right for 1 seconds!')
+                    dc_motors.right(255, 3)
+                    print('Getting too close, turning right for 2 seconds!')
 
             # Turning doesnt seem to work, lets go in reverse
             elif turn_attempts > MAX_TURN_ATTEMPTS:
@@ -326,11 +425,11 @@ def run(board, dc_motors, sonar):
                     # Check if the obstacle is cleared
                     if dc_motors.state.startswith('turning'):
                         if distance < MIN_DISTANCE:
-                            print("%s for 2 seconds wasn't enough. Lets do another sec" % dc_motors.state)
+                            print("%s for 2 seconds wasn't enough. Lets do another 2 sec" % dc_motors.state)
                             if dc_motors.state.endswith('left'):
-                                dc_motors.left(255, 1)
+                                dc_motors.left(255, 2)
                             else:
-                                dc_motors.right(255, 1)
+                                dc_motors.right(255, 2)
                             turn_attempts += 1
                         else:
                             print('Ok, obstacle cleared, moving forward...')
@@ -343,11 +442,11 @@ def run(board, dc_motors, sonar):
                         turn_attempts += 1
                         random_value = random.randint(1, 2)
                         if random_value == 1:
-                            print('Finished reversing, turning left for a sec')
-                            dc_motors.left(255, 1)
+                            print('Finished reversing, turning left for 2 sec')
+                            dc_motors.left(255, 2)
                         elif random_value == 2:
-                            dc_motors.right(255, 1)
-                            print('Finished reversing, turning right for a sec')
+                            dc_motors.right(255, 2)
+                            print('Finished reversing, turning right for 2 sec')
 
             # run for a bit before re-iterating through the loop again
             board.sleep(0.2)
