@@ -1,0 +1,2 @@
+pymata3-aio
+numpy
