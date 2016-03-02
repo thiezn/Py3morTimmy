@@ -5,10 +5,7 @@ import evdev
 
 
 class RemoteControl:
-    async def _events(self):
-        """ Coroutine printing out incoming events """
-        async for event in self.device.async_read_loop():
-            self.handle_event(event)
+    """ A remote control for handling morTimmy the Robot """
 
     def __init__(self, input_device='/dev/input/event0', loop=None):
         """ Connect to controller and define buttons """
@@ -39,6 +36,22 @@ class RemoteControl:
         self.L1 = False
         self.L2 = False
 
+    def _recalc_axis(self, value):
+        """ Recalculates the ps3 axis to a range usable with dc motors
+
+        the PS3 axis reports values between 0-254 with 127 being
+        the center position.
+
+        dc motors have a range of -255 to 255 with 0 being idle,
+        negative numbers reverse.
+        """
+        if value == 255:
+            return value
+        elif value >= 127:
+            return value * 2 - 254
+        else:
+            return value * 2 - 255
+
     async def handle_events(self):
         """
         Handle a single evdev event, this updates the internal state of the Axis objects as well as calling any
@@ -49,16 +62,16 @@ class RemoteControl:
             if event.type == evdev.ecodes.EV_ABS:
                 if event.code == 0:
                     # Left stick, X axis
-                    self.LEFT_AXIS_X = event.value
+                    self.LEFT_AXIS_X = self._recalc_axis(event.value)
                 elif event.code == 1:
                     # Left stick, Y axis
-                    self.LEFT_AXIS_Y = event.value
+                    self.LEFT_AXIS_Y = self._recalc_axis(event.value)
                 elif event.code == 2:
                     # Right stick, X axis
-                    self.RIGHT_AXIS_X = event.value
+                    self.RIGHT_AXIS_X = self._recalc_axis(event.value)
                 elif event.code == 5:
                     # Right stick, Y axis (yes, 5...)
-                    self.RIGHT_AXIS_Y = event.value
+                    self.RIGHT_AXIS_Y = self._recalc_axis(event.value)
             elif event.type == evdev.ecodes.EV_KEY:
                 if event.value == 1:  # Key Down
                     if event.code == 288:
