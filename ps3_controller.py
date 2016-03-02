@@ -134,4 +134,12 @@ class RemoteControl:
                         self.L2 = False
 
 if __name__ == '__main__':
-    controller = Ps3Controller()
+    controller = RemoteControl()
+    loop = asyncio.get_event_loop()
+    while not controller.START:
+        future = asyncio.ensure_future(controller.handle_events())
+        loop.run_until_complete(future)
+        print('x={} y={} x={} y={}'.format(controller.LEFT_AXIS_X,
+                                           controller.LEFT_AXIS_Y,
+                                           controller.RIGHT_AXIS_X,
+                                           controller.RIGHT_AXIS_Y))
